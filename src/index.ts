@@ -27,8 +27,6 @@ const io = new Server(httpServer, {
 const usersInRooms = new Map<string, Set<{ userId: string; name: string }>>();
 
 io.on("connection", (socket: Socket) => {
-  console.log("socket connected ...");
-
   socket.on("createRoom", ({ name }) => {
     const roomId = uuidv4();
     socket.join(roomId);
@@ -41,13 +39,16 @@ io.on("connection", (socket: Socket) => {
     io.to(roomId).emit("userJoin", { userId: socket.id, name });
   });
 
-  socket.on("joinRoom", ({ roomId, name }) => {
-    socket.join(roomId);
-    usersInRooms.get(roomId)?.add({ userId: socket.id, name });
+  socket.on(
+    "joinRoom",
+    ({ roomId, name }: { roomId: string; name: string }) => {
+      socket.join(roomId);
+      usersInRooms.get(roomId)?.add({ userId: socket.id, name });
 
-    // Broadcast user join event to all users in the room
-    io.to(roomId).emit("userJoin", { userId: socket.id, name });
-  });
+      // Broadcast user join event to all users in the room
+      io.to(roomId).emit("userJoin", { userId: socket.id, name });
+    }
+  );
 
   socket.on("disconnect", () => {
     let leftRoomId = null;

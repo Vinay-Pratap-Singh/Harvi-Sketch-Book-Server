@@ -27,6 +27,7 @@ const io = new Server(httpServer, {
 const usersInRooms = new Map<string, Set<{ userId: string; name: string }>>();
 
 io.on("connection", (socket: Socket) => {
+  // for room creation
   socket.on("createRoom", ({ name }: { name: string }) => {
     const roomId = uuidv4();
     socket.join(roomId);
@@ -39,6 +40,7 @@ io.on("connection", (socket: Socket) => {
     io.to(roomId).emit("userJoin", { name });
   });
 
+  // for room joining
   socket.on(
     "joinRoom",
     ({ roomId, name }: { roomId: string; name: string }) => {
@@ -56,6 +58,7 @@ io.on("connection", (socket: Socket) => {
     }
   );
 
+  // for leaving the room
   socket.on(
     "leaveBoard",
     ({ roomId, name }: { roomId: string; name: string }) => {
@@ -78,6 +81,15 @@ io.on("connection", (socket: Socket) => {
     }
   );
 
+  // for deleting the room
+  socket.on("deleteRoom", ({ roomId }: { roomId: string }) => {
+    io.to(roomId).emit("roomDeleted", {
+      message: "Admin has stopped the live collaboration",
+    });
+    usersInRooms.delete(roomId);
+  });
+
+  // when user disconnects
   socket.on("disconnect", () => {
     let leftRoomId = null;
 

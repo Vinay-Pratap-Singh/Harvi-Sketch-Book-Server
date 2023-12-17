@@ -34,10 +34,7 @@ io.on("connection", (socket: Socket) => {
     usersInRooms.set(roomId, new Set([{ userId: socket.id, name }]));
 
     // Broadcast room creation event to the user
-    socket.emit("roomCreated", { roomId });
-
-    // Broadcast user join event to all users in the room
-    io.to(roomId).emit("userJoin", { name });
+    socket.emit("roomCreated", { roomId, name });
   });
 
   // for room joining
@@ -45,12 +42,14 @@ io.on("connection", (socket: Socket) => {
     "joinRoom",
     ({ roomId, name }: { roomId: string; name: string }) => {
       if (usersInRooms.has(roomId)) {
+        console.log("inside user in room");
         socket.join(roomId);
         usersInRooms.get(roomId)?.add({ userId: socket.id, name });
 
         // Broadcast user join event to all users in the room
-        io.to(roomId).emit("userJoin", { name });
+        io.to(roomId).emit("userJoin", { name, roomId });
       } else {
+        console.log("invalid user in room");
         socket.emit("invalidRoom", {
           message: "Please enter a valid room code",
         });
@@ -62,6 +61,7 @@ io.on("connection", (socket: Socket) => {
   socket.on(
     "leaveBoard",
     ({ roomId, name }: { roomId: string; name: string }) => {
+      console.log("room left");
       const usersInRoom = usersInRooms.get(roomId);
 
       if (usersInRoom) {
@@ -89,8 +89,30 @@ io.on("connection", (socket: Socket) => {
     usersInRooms.delete(roomId);
   });
 
+  // for receiving and sending the data
+  socket.on(
+    "sendSketchBoardData",
+    ({
+      index,
+      data,
+      roomId,
+    }: {
+      index: number;
+      data: string[];
+      roomId: string;
+    }) => {
+      console.log("getting data");
+      console.log(index, data, roomId, "working");
+      io.to(roomId).emit("receiveSketchBoardData", { index, data } as {
+        index: number;
+        data: string[];
+      });
+    }
+  );
+
   // when user disconnects
   socket.on("disconnect", () => {
+    console.log("inside disconnect");
     let leftRoomId = null;
 
     // Find the room from which the user is disconnecting
@@ -99,6 +121,7 @@ io.on("connection", (socket: Socket) => {
         (user) => user.userId === socket.id
       );
       if (userLeaving) {
+        console.log("leaving", userLeaving);
         leftRoomId = roomId;
         users.delete(userLeaving);
 
@@ -110,6 +133,7 @@ io.on("connection", (socket: Socket) => {
     });
 
     if (leftRoomId) {
+      console.log("room left");
       // If the room is now empty, remove it
       if (usersInRooms.get(leftRoomId)?.size === 0) {
         usersInRooms.delete(leftRoomId);

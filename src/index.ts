@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
+import { IRectangleArgs } from "./helper/interface";
 
 dotenv.config();
 
@@ -89,26 +90,16 @@ io.on("connection", (socket: Socket) => {
     usersInRooms.delete(roomId);
   });
 
-  // for receiving and sending the data
-  socket.on(
-    "sendSketchBoardData",
-    ({
-      index,
-      data,
-      roomId,
-    }: {
-      index: number;
-      data: string[];
-      roomId: string;
-    }) => {
-      console.log("getting data");
-      console.log(index, data, roomId, "working");
-      io.to(roomId).emit("receiveSketchBoardData", { index, data } as {
-        index: number;
-        data: string[];
-      });
-    }
-  );
+  // for drawing rectangle
+  socket.on("sendRectangleData", (data: IRectangleArgs) => {
+    console.log("getting data", data);
+    if (!data.roomId) return;
+    io.to(data.roomId).emit("receiveRectangleData", data);
+  });
+
+  socket.on("test", (data: string) => {
+    io.to(data).emit("test", "love you");
+  });
 
   // when user disconnects
   socket.on("disconnect", () => {

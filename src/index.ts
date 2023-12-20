@@ -5,7 +5,12 @@ import dotenv from "dotenv";
 import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
-import { IShapesArgs, IWriteText } from "./helper/interface";
+import {
+  IBeginPathPencil,
+  IDrawPathPencil,
+  IShapesArgs,
+  IWriteText,
+} from "./helper/interface";
 
 dotenv.config();
 
@@ -82,6 +87,22 @@ io.on("connection", (socket: Socket) => {
   });
 
   // for sendind and recieving the shapes data
+  // for using the pencil
+  socket.on("sendBeginPath", (data: IBeginPathPencil) => {
+    if (!data.roomId) return;
+    io.to(data.roomId).emit("receiveBeginPath", data);
+  });
+
+  socket.on("sendDrawPath", (data: IDrawPathPencil) => {
+    if (!data.roomId) return;
+    io.to(data.roomId).emit("receiveDrawPath", data);
+  });
+
+  socket.on("sendClosePath", ({ roomId }: { roomId: string }) => {
+    if (!roomId) return;
+    io.to(roomId).emit("receiveClosePath");
+  });
+
   // for drawing rectangle
   socket.on("sendRectangleData", (data: IShapesArgs) => {
     if (!data.roomId) return;

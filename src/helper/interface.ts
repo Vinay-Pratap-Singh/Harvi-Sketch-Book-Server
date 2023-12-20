@@ -9,9 +9,9 @@ export interface ILineStroke {
   content: string;
 }
 
-export interface IRectangleArgs {
+export interface IShapesArgs {
   coordinate: ICoordinate;
-  canvas: HTMLCanvasElement;
+  canvas?: HTMLCanvasElement;
   strokeColor: string;
   strokeStyle: ILineStroke;
   currentShapeFillColor: string;

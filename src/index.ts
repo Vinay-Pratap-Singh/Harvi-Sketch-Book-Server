@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
-import { IShapesArgs } from "./helper/interface";
+import { IShapesArgs, IWriteText } from "./helper/interface";
 
 dotenv.config();
 
@@ -98,6 +98,18 @@ io.on("connection", (socket: Socket) => {
   socket.on("sendArrowData", (data: IShapesArgs) => {
     if (!data.roomId) return;
     io.to(data.roomId).emit("receiveArrowData", data);
+  });
+
+  // for drawing line
+  socket.on("sendLineData", (data: IShapesArgs) => {
+    if (!data.roomId) return;
+    io.to(data.roomId).emit("receiveLineData", data);
+  });
+
+  // for writing text
+  socket.on("sendWriteTextData", (data: IWriteText) => {
+    if (!data.roomId) return;
+    io.to(data.roomId).emit("receiveWriteTextData", data);
   });
 
   // when user disconnects

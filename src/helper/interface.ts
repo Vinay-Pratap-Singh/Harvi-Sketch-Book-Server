@@ -18,3 +18,14 @@ export interface IShapesArgs {
   strokeWidth: number;
   roomId?: string;
 }
+
+export interface IWriteText {
+  text: string;
+  offsetX: number;
+  offsetY: number;
+  strokeWidth: number;
+  fontType: string;
+  strokeColor: string;
+  canvas?: HTMLCanvasElement;
+  roomId?: string;
+}

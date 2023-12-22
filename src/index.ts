@@ -133,6 +133,21 @@ io.on("connection", (socket: Socket) => {
     io.to(data.roomId).emit("receiveWriteTextData", data);
   });
 
+  // for adding image
+  socket.on("sendImageData", ({ url, x, y, roomId }) => {
+    if (!roomId) return;
+    io.to(roomId).emit("receiveImageData", { url, x, y });
+  });
+
+  // for undo and redo
+  socket.on(
+    "sendIndex",
+    ({ operation, roomId }: { operation: string; roomId: string }) => {
+      if (!roomId) return;
+      io.to(roomId).emit("receiveIndex", { operation });
+    }
+  );
+
   // when user disconnects
   socket.on("disconnect", () => {
     let leftRoomId = null;

@@ -32,6 +32,7 @@ export interface IWriteText {
 
 // for begin path coordinates
 export interface IBeginPathPencil {
+  canvas?: HTMLCanvasElement;
   roomId: string;
   x: number;
   y: number;

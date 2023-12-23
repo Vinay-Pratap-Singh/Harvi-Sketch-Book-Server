@@ -4,9 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
     "dev": "nodemon src/index.ts"
   },
-  "keywords": [],
+  "keywords": [
+    "harvi",
+    "excali draw clone",
+    "drawing board"
+  ],
   "author": "",
   "license": "ISC",
   "devDependencies": {

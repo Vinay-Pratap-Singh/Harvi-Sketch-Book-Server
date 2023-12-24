@@ -15,20 +15,18 @@ import {
 dotenv.config();
 
 const app = express();
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+const isDev = app.settings.env === "development";
+const URL = isDev ? "http://localhost:3000" : process.env.FRONTEND_URL;
 app.use(
   cors({
-    origin: (process.env.FRONTEND_URL as string) || "http://localhost:3000",
-    credentials: true,
-    optionsSuccessStatus: 200,
+    origin: URL,
   })
 );
 
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: process.env.FRONTEND_URL || "http://localhost:3000",
+    origin: URL,
   },
 });
 
